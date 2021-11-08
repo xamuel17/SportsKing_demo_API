@@ -10,12 +10,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.sport.models.User;
+import com.sport.repository.UserRepository;
 import com.sport.security.jwt.AuthEntryPointJwt;
 import com.sport.security.jwt.AuthTokenFilter;
+import com.sport.security.services.UserDetailsImpl;
 import com.sport.security.services.UserDetailsServiceImpl;
 
 
@@ -31,6 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
+	
+	
 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -48,6 +55,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
+	
+	
+	
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -56,6 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()
+		
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 			.authorizeRequests().antMatchers(
@@ -65,8 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     "/swagger-resources/**",
                     "/configuration/security",
                     "/swagger-ui.html",
-                    "/webjars/**"
-					
+                    "/webjars/**"					
 					).permitAll()
 			.antMatchers("/api/test/**").permitAll()
 			.anyRequest().authenticated();
