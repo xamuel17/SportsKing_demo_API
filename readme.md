@@ -1,4 +1,12 @@
 Welcome to my Demo SportKing API 
+This demo application runs on springboot technology (JAVA) . It consists of: 
+
+1. Spring Security for user authentication and authorization
+2. JWT Authentication
+3. MySql Database connection
+4. Flyway for database version control
+5. File upload and view capabilities 
+
 
 
 Step 1:
