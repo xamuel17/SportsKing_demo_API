@@ -50,8 +50,11 @@ public class User {
 	
 	@NotBlank
 	@Size(max = 25)
+	 @Column( unique=true)
 	private String phone;
 	
+	@Column
+	private String photo;
 
     @Column
     private boolean isVerified;
@@ -59,6 +62,11 @@ public class User {
    
 	@Column
     private String verificationCode ;
+	
+	
+	@Column(columnDefinition = "TEXT")
+	@NotBlank
+	private String interest;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles", 
@@ -71,13 +79,14 @@ public class User {
 	}
 	
 	
-	public User(String username, String email, String phone,String password, String verificationCode) {
+	public User(String username, String email, String phone,String password, String verificationCode, String interest) {
 		this.username = username;
 		this.phone = phone;
 		this.email = email;
 		this.password = password;
 		this.verificationCode = verificationCode;
 		this.isVerified = false;
+		this.interest = interest;
 	}
 
 	
@@ -159,8 +168,28 @@ public class User {
 	}
 
 
+	public String getInterest() {
+		return interest;
+	}
+
+
+	public void setInterest(String interest) {
+		this.interest = interest;
+	}
+
+
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+
+	public String getPhoto() {
+		return photo;
+	}
+
+
+	public void setPhoto(String photo) {
+		this.photo = photo;
 	}
 	
 }

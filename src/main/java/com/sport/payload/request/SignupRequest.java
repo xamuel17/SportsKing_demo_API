@@ -8,6 +8,7 @@ public class SignupRequest {
 	private String email;
 	private String password;
 	private String phone;
+	private String interest;
 	Set<String> role;
 	
 	
@@ -60,6 +61,16 @@ public class SignupRequest {
 
 	public Set<String> getRole() {
 		return role;
+	}
+
+
+	public String getInterest() {
+		return interest;
+	}
+
+
+	public void setInterest(String interest) {
+		this.interest = interest;
 	}
 
 

@@ -1,29 +1,37 @@
 package com.sport;
 
-import javax.sql.DataSource;
+import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DataSourceInitializer;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import com.sport.models.Role;
-import com.sport.repository.RoleRepository;
+import com.sport.service.FilesStorageService;
 
 
 @SpringBootApplication
 public class SportskingApplication {
+	
+	
+	  @Resource
+	  FilesStorageService storageService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SportskingApplication.class, args);
+
 	}
+	
+	
+	
+	
+    //Initialize storage
+    public void run(String... arg) throws Exception {
+      storageService.deleteAll();
+      storageService.init();
+    }
 
 	
 	 //Defining the MessageSource Bean
@@ -58,6 +66,8 @@ public class SportskingApplication {
 	
 	
 	
-	 
+	    
+	
+	
 	 
 }

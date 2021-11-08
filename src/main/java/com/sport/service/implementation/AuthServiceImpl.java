@@ -77,9 +77,10 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 			// Create new user's account
+		String interest = stringUtil.convertInterestToArray(signUpRequest.getInterest());
 		String verificationCode = stringUtil.generateRandomString();
 		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPhone(),
-				encoder.encode(signUpRequest.getPassword()),verificationCode );
+				encoder.encode(signUpRequest.getPassword()),verificationCode , interest);
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
@@ -144,20 +145,64 @@ public class AuthServiceImpl implements AuthService {
 	
 	
 	public ResponseEntity<?> loginUser(LoginRequest loginRequest){
+		Authentication authentication = null;
 		
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
+	
+		
+			if(loginRequest.getEmail() != null ) {
+				 authentication = authenticationManager.authenticate(
+						new UsernamePasswordAuthenticationToken( loginRequest.getEmail(),loginRequest.getPassword()));
+			
+			}
+			
+				
+		
+	
+			if (loginRequest.getPhone() != null) {
+				 authentication = authenticationManager.authenticate(
+						new UsernamePasswordAuthenticationToken( loginRequest.getPhone(),loginRequest.getPassword()));
+			}	
+			
+		
+		
+	
+	
+		
+	
+		
+		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
-
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
-				.collect(Collectors.toList());
-		return ResponseEntity.ok(
-				new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+		
+		//Check if account is activated
+		Boolean is_verified = userRepository.findWhereUserActive(loginRequest.getEmail());
+		if(is_verified == true){
+			String jwt = jwtUtils.generateJwtToken(authentication);
+			UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+			List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+					.collect(Collectors.toList());
+			return ResponseEntity.ok(
+					new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+			
+		}else {
+			
+			return ResponseEntity.ok( new MessageResponse<Object>("Account not verified", 00, null));
+		}
+	
 		
 	}
 
 	
+	
+	
+	
+	
+//	public ResponseEntity<?> PasswordChange(String email){
+//		
+//	User user=userRepository.findByEmail(email);
+//	
+//		
+//		return null;
+//		
+//		
+//	}
 }
