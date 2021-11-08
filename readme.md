@@ -28,7 +28,7 @@ http://localhost:8080/swagger-ui.html
 
 
 
-![Screenshot](https://drive.google.com/file/d/1OzR9qlHazxHcWzBZpnPiiFi14xjjU_41/view?usp=sharing)
+![Screenshot](https://drive.google.com/file/d/1OzR9qlHazxHcWzBZpnPiiFi14xjjU_41/preview)
   
   
   <iframe src="https://drive.google.com/file/d/1OzR9qlHazxHcWzBZpnPiiFi14xjjU_41/preview" width="640" height="480" allow="autoplay"></iframe>
