@@ -35,39 +35,36 @@ import com.sport.service.AuthService;
 import com.sport.service.EmailService;
 import com.sport.util.StringUtil;
 
-
 @Service(value = "authService")
 public class AuthServiceImpl implements AuthService {
-	
-	
+
 	@Autowired
 	AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	UserRepository userRepository;
 
 	@Autowired
 	RoleRepository roleRepository;
-	
+
 	@Autowired
 	PasswordEncoder encoder;
-	
+
 	@Autowired
 	StringUtil stringUtil;
-	
-    @Autowired
+
+	@Autowired
 	private EmailService emailService;
-    
-    @Autowired
-    EmailProperties emailProps;
+
+	@Autowired
+	EmailProperties emailProps;
 
 	@Autowired
 	JwtUtils jwtUtils;
-	
-	   private static final Logger LOGGER=LoggerFactory.getLogger(AuthServiceImpl.class);
-		
-	
-	public ResponseEntity<?> createUser(SignupRequest signUpRequest){
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthServiceImpl.class);
+
+	public ResponseEntity<?> createUser(SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity.badRequest().body(new RuntimeException("Error: Username is already taken!"));
 		}
@@ -76,11 +73,11 @@ public class AuthServiceImpl implements AuthService {
 			return ResponseEntity.badRequest().body(new RuntimeException("Error: Email is already in use!"));
 		}
 
-			// Create new user's account
+		// Create new user's account
 		String interest = stringUtil.convertInterestToArray(signUpRequest.getInterest());
 		String verificationCode = stringUtil.generateRandomString();
 		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getPhone(),
-				encoder.encode(signUpRequest.getPassword()),verificationCode , interest);
+				encoder.encode(signUpRequest.getPassword()), verificationCode, interest);
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
@@ -113,89 +110,61 @@ public class AuthServiceImpl implements AuthService {
 
 		user.setRoles(roles);
 		User userdata = userRepository.save(user);
-		
-		//Send email
+
+		// Send email
 		MailRequest request = new MailRequest();
 		request.setFrom(emailProps.getAppEmail());
 		request.setVerificationCode(verificationCode);
-		request.setSubject("SportKing Account Creation");
+		request.setSubject("Welcome to SportKing");
 		request.setTo(signUpRequest.getEmail());
-		
+
 		Map<String, Object> model = new HashMap<>();
-		model.put("date",stringUtil.generateNowDate() );
+		model.put("date", stringUtil.generateNowDate());
 		model.put("verificationCode", verificationCode);
-		
+
 		try {
-			emailService.sendTransactionEmail(request, model);	
-		}catch(Exception e) {
+			emailService.sendTransactionEmail(request, model);
+		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
-	
 
-		return ResponseEntity.ok(new MessageResponse<User>("User registered successfully!",00,userdata));
+		return ResponseEntity.ok(new MessageResponse<User>("User registered successfully!", 00, userdata));
 
-		
-		
 	}
-	
-	
-	
-	
-	
-	
-	
-	public ResponseEntity<?> loginUser(LoginRequest loginRequest){
+
+	public ResponseEntity<?> loginUser(LoginRequest loginRequest) {
 		Authentication authentication = null;
-		
-	
-		
-			if(loginRequest.getEmail() != null ) {
-				 authentication = authenticationManager.authenticate(
-						new UsernamePasswordAuthenticationToken( loginRequest.getEmail(),loginRequest.getPassword()));
-			
-			}
-			
-				
-		
-	
-			if (loginRequest.getPhone() != null) {
-				 authentication = authenticationManager.authenticate(
-						new UsernamePasswordAuthenticationToken( loginRequest.getPhone(),loginRequest.getPassword()));
-			}	
-			
-		
-		
-	
-	
-		
-	
-		
-		
+
+		if (loginRequest.getEmail() != null) {
+			authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+		}
+
+		if (loginRequest.getPhone() != null) {
+			authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getPhone(), loginRequest.getPassword()));
+		}
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
-		//Check if account is activated
+
+		// Check if account is activated
 		Boolean is_verified = userRepository.findWhereUserActive(loginRequest.getEmail());
-		if(is_verified == true){
+		if (is_verified == true) {
 			String jwt = jwtUtils.generateJwtToken(authentication);
 			UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 			List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 					.collect(Collectors.toList());
-			return ResponseEntity.ok(
-					new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
-			
-		}else {
-			
-			return ResponseEntity.ok( new MessageResponse<Object>("Account not verified", 00, null));
+			return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+					userDetails.getEmail(), roles));
+
+		} else {
+
+			return ResponseEntity.ok(new MessageResponse<Object>("Account not verified", 00, null));
 		}
-	
-		
+
 	}
 
-	
-	
-	
-	
-	
 //	public ResponseEntity<?> PasswordChange(String email){
 //		
 //	User user=userRepository.findByEmail(email);

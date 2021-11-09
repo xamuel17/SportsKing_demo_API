@@ -1,4 +1,5 @@
 package com.sport.models;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,11 +12,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -62,6 +67,16 @@ public class User {
    
 	@Column
     private String verificationCode ;
+	
+	   
+	@CreationTimestamp
+	private Date created_at ;
+	   
+	@UpdateTimestamp
+	private Date updated_at ;
+
+
+	
 	
 	
 	@Column(columnDefinition = "TEXT")
